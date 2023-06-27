@@ -8,6 +8,24 @@ app.use(bodyParser.json());
 
 // // Create a Sequelize instance to connect to the database
 const sequelize = new Sequelize(process.env.YOUR_DB_URI);
+// Define the Contact model
+class Contact extends Model {}
+Contact.init(
+  {
+    phoneNumber: DataTypes.STRING,
+    email: DataTypes.STRING,
+    linkedId: DataTypes.INTEGER,
+    linkPrecedence: DataTypes.ENUM('primary', 'secondary'),
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+    deletedAt: DataTypes.DATE,
+  },
+  {
+    sequelize,
+    modelName: 'Contact',
+    tableName: 'Contact',
+  }
+);
 // Sync the models with the database and start the server
 sequelize.sync().then(() => {
     app.listen(3000, () => {

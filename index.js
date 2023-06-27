@@ -68,7 +68,7 @@ app.post('/identify', async (req, res) => {
                 },
             }),
         ]);
-        
+
         if (otherRecord) {
 
             console.log(otherRecord.email + primaryContactId)
@@ -86,6 +86,40 @@ app.post('/identify', async (req, res) => {
             console.log(recordsToUpdate);
         }
 
+        const newPrimaryContact = await Contact.findOne({
+            where: {
+                id: primaryContact.linkedId,
+                ...(primaryContact.linkedId !== null ? {} : { id: null })
+            }
+        });
+        //Get the final primary contact
+        const finalContact = newPrimaryContact || primaryContact;
+
+        // Find all secondary contacts linked to the primary contact to be sent as response
+        const secondaryContacts = await Contact.findAll({
+            where: {
+                linkedId: finalContact.id,
+                linkPrecedence: 'secondary',
+            },
+        });
+        console.log(secondaryContacts);
+        // Extract the emails and phone numbers
+        const emails = [...new Set([finalContact.email, ...secondaryContacts.flatMap((contact) => contact.email)].filter((email) => email))];
+        const phoneNumbers = [...new Set([finalContact.phoneNumber, ...secondaryContacts.flatMap((contact) => contact.phoneNumber)].filter((phoneNumber) => phoneNumber))];
+        const secondaryContactIds = secondaryContacts.map((contact) => contact.id);
+
+        // Prepare the response payload
+        const payload = {
+            contact: {
+                primaryContactId: finalContact.id,
+                emails,
+                phoneNumbers,
+                secondaryContactIds,
+            },
+        };
+
+        res.json(payload);
+
     } else {
         // Create a new primary contact
         const newContact = await Contact.create({
@@ -95,6 +129,17 @@ app.post('/identify', async (req, res) => {
             createdAt: new Date(),
             updatedAt: new Date(),
         });
+        // Prepare the response payload with empty secondary contact IDs
+        const payload = {
+            contact: {
+                primaryContactId: newContact.id,
+                emails: [newContact.email],
+                phoneNumbers: [newContact.phoneNumber],
+                secondaryContactIds: [],
+            },
+        };
+
+        res.json(payload);
 
 
     }

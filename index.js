@@ -68,6 +68,23 @@ app.post('/identify', async (req, res) => {
                 },
             }),
         ]);
+        
+        if (otherRecord) {
+
+            console.log(otherRecord.email + primaryContactId)
+            const otherRecordId = otherRecord.linkedId || otherRecord.id;
+            await Contact.update({ linkedId: primaryContactId, linkPrecedence: 'secondary' }, {
+                where: { id: otherRecordId }
+            });
+
+            const recordsToUpdate = await Contact.update({
+                linkedId: primaryContactId,
+            }, {
+                where: { linkedId: otherRecordId },
+            });
+
+            console.log(recordsToUpdate);
+        }
 
     } else {
         // Create a new primary contact

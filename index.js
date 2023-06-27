@@ -40,15 +40,34 @@ app.post('/identify', async (req, res) => {
 
     if (primaryContact) {
         const primaryContactId = primaryContact.linkedId || primaryContact.id;
-        const newContact = await Contact.create({
-            email,
-            phoneNumber,
-            linkedId: primaryContactId,
-            linkPrecedence: 'secondary',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        })
-
+        console.log(primaryContactId);
+        const [newContact, otherRecord] = await Promise.all([
+            Contact.create({
+                email,
+                phoneNumber,
+                linkedId: primaryContactId,
+                linkPrecedence: 'secondary',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            }),
+            Contact.findOne({
+                where: {
+                    [Op.and]: [
+                        {
+                            [Op.or]: [{ email }, { phoneNumber }],
+                        },
+                        {
+                            [Op.or]: [
+                                {
+                                    [Op.and]: [{ id: { [Op.ne]: primaryContactId } }, { linkedId: null }],
+                                },
+                                { linkedId: { [Op.ne]: primaryContactId } },
+                            ],
+                        },
+                    ],
+                },
+            }),
+        ]);
 
     } else {
         // Create a new primary contact

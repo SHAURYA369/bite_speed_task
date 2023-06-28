@@ -30,7 +30,6 @@ Contact.init(
 app.post('/identify', async (req, res) => {
     const { email, phoneNumber } = req.body;
 
-    // Find the primary contact based on email or phone number
     const primaryContact = await Contact.findOne({
         where: {
             [Op.or]: [{ email }, { phoneNumber }],
@@ -40,15 +39,22 @@ app.post('/identify', async (req, res) => {
 
     if (primaryContact) {
         const primaryContactId = primaryContact.linkedId || primaryContact.id;
+
         console.log(primaryContactId);
+
         const [newContact, otherRecord] = await Promise.all([
-            Contact.create({
-                email,
-                phoneNumber,
-                linkedId: primaryContactId,
-                linkPrecedence: 'secondary',
-                createdAt: new Date(),
-                updatedAt: new Date(),
+            Contact.findOrCreate({
+                where: {
+                    [Op.and]: [{ email }, { phoneNumber }],
+                },
+                defaults: {
+                    email,
+                    phoneNumber,
+                    linkedId: primaryContactId,
+                    linkPrecedence: 'secondary',
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                }
             }),
             Contact.findOne({
                 where: {

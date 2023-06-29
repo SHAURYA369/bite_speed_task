@@ -31,7 +31,7 @@ Contact.init(
 app.post('/identify', async (req, res) => {
     const { email, phoneNumber } = req.body;
     if(!validateEmail(email) || !validatePhoneNumber(phoneNumber)){
-        res.status(400).json({error:'Invalid email or phone number'});
+        res.status(400).json({error:'Invalid email  or phone number (should be a 10 digit number)'});
         return;
     }
    

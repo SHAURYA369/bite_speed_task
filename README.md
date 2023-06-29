@@ -8,10 +8,9 @@ This README provides instructions for running the project locally or accessing t
 
 If you prefer to access the hosted server, follow the instructions below:
 
-Server URL: https://bitespeed-backend.onrender.com
+Server URL: http://52.66.132.135/identify
 
 Note: Since the server is hosted, there is no need to perform the local setup steps mentioned below. You can directly access the server using the provided URL.
-
 
 ## Running Locally
 

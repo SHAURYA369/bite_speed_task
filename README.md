@@ -36,7 +36,7 @@ Create a .env file in the project root directory and set the following variables
 YOUR_DB_URI=<postgresql-uri>
 PORT=<port-number>
 ```
-Replace <repository-url> with the URL of your repository. Replace <postgresql-uri> with the URI for your PostgreSQL database, and <port-number> with the desired port number for the server.
+Replace <postgresql-uri> with the URI for your PostgreSQL database, and <port-number> with the desired port number for the server.
 
 ### Step 3: Install Dependencies
 

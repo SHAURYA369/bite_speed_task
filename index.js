@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Sequelize, Model, DataTypes, Op } = require('sequelize');
+const{validateEmail,validatePhoneNumber}=require('./utils/utility');
 require('dotenv').config();
 // Create an instance of Express
 const app = express();
@@ -29,7 +30,11 @@ Contact.init(
 
 app.post('/identify', async (req, res) => {
     const { email, phoneNumber } = req.body;
-
+    if(!validateEmail(email) || !validatePhoneNumber(phoneNumber)){
+        res.status(400).json({error:'Invalid email or phone number'});
+        return;
+    }
+   
     const primaryContact = await Contact.findOne({
         where: {
             [Op.or]: [{ email }, { phoneNumber }],
@@ -125,6 +130,7 @@ app.post('/identify', async (req, res) => {
         };
 
         res.json(payload);
+        return;
 
     } else {
         // Create a new primary contact
@@ -146,6 +152,7 @@ app.post('/identify', async (req, res) => {
         };
 
         res.json(payload);
+        return;
 
 
     }
